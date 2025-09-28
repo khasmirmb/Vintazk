@@ -35,7 +35,7 @@
             </svg>
             <span class="sr-only">Toggle sidebar</span>
           </button>
-          <a href="#" class="flex items-center justify-between mr-4">
+          <a href="/" class="flex items-center justify-between mr-4">
             <img
               src="{{ asset('logo.webp') }}"
               class="mr-3 h-8"
