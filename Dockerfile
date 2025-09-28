@@ -1,4 +1,4 @@
-FROM php:8.2-cli
+FROM php:8.3-cli
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
@@ -36,8 +36,8 @@ COPY . .
 EXPOSE 8000
 
 # Install PHP and JS dependencies
-RUN composer install
-RUN npm install
+RUN composer install --no-dev --optimize-autoloader
+RUN npm install && npm run build
 
-
+# Run migrations, seed data, then start Laravel
 CMD php artisan migrate --force && php artisan db:seed --class=KpiSeeder && php artisan serve --host=0.0.0.0 --port=8000
