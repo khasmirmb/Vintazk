@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AgentController;
+use App\Http\Controllers\TeamController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\DB;
 
@@ -167,3 +168,6 @@ Route::get('/', function () {
 
 
 Route::get('/agent', action: [AgentController::class, 'index'])->name('agent');
+
+Route::get('/team', action: [TeamController::class, 'index'])->name('team');
+
