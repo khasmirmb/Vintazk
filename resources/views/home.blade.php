@@ -1,6 +1,6 @@
 @include('partials.header')
 
-<div class="antialiased bg-gray-50 dark:bg-gray-900">
+<div class="antialiased bg-gray-50 dark:bg-gray-900 h-screen">
 
     <!-- Navigation -->
     @include('partials.navigation')
@@ -8,7 +8,7 @@
     <!-- Sidebar -->
     @include('partials.sidebar')
 
-        <main class="p-4 md:ml-64 h-auto pt-20">
+        <main class="p-4 md:ml-64 pt-20 h-screen">
             <div class="grid grid-cols-2 gap-4 mb-4">
                     <div class="border-2 border-gray-300 rounded-lg dark:border-gray-600">
                         @include('cards.first')
