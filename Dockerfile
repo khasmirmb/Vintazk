@@ -35,17 +35,16 @@ WORKDIR /var/www/html
 # Copy composer and package files first for caching
 COPY composer.json composer.lock package.json package-lock.json* ./
 
-# Generate .env file to avoid missing APP_KEY
-COPY .env.example .env
-RUN php -r "file_exists('.env') || copy('.env.example', '.env');" \
-    && php artisan key:generate --force
-
 # Install PHP and JS dependencies
 RUN composer install --no-dev --optimize-autoloader \
     && npm install && npm run build
 
 # Copy the rest of the application
 COPY . .
+
+# Generate .env file and APP_KEY
+RUN php -r "file_exists('.env') || copy('.env.example', '.env');" \
+    && php artisan key:generate --force
 
 # Set permissions for Laravel storage and cache
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache \
@@ -54,5 +53,5 @@ RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cac
 # Expose port (Railway assigns $PORT dynamically)
 EXPOSE $PORT
 
-# Start the application
+# Start the application with migrations and seeding
 CMD ["sh", "-c", "php artisan migrate --force && php artisan db:seed --class=KpiSeeder --force && php artisan serve --host=0.0.0.0 --port=$PORT"]
