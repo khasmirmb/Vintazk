@@ -32,23 +32,25 @@ RUN curl -sL https://deb.nodesource.com/setup_18.x | bash - \
 # Set working directory
 WORKDIR /var/www/html
 
-# Copy composer and package files first for caching
-COPY composer.json composer.lock package.json package-lock.json* ./
-
-# Install PHP and JS dependencies
-RUN composer install --no-dev --optimize-autoloader \
-    && npm install && npm run build
-
-# Copy the rest of the application
+# Copy all application files (needed for artisan during composer install)
 COPY . .
 
-# Generate .env file and APP_KEY
+# Generate .env file and APP_KEY before composer install
 RUN php -r "file_exists('.env') || copy('.env.example', '.env');" \
     && php artisan key:generate --force
+
+# Install PHP dependencies, skipping scripts to avoid package:discover
+RUN composer install --no-dev --optimize-autoloader --no-scripts
+
+# Install JS dependencies (if needed)
+RUN [ -f "package.json" ] && npm install && npm run build || true
 
 # Set permissions for Laravel storage and cache
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache \
     && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
+
+# Run package:discover explicitly after setup
+RUN php artisan package:discover --ansi
 
 # Expose port (Railway assigns $PORT dynamically)
 EXPOSE $PORT
