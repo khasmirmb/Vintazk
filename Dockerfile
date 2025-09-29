@@ -1,4 +1,4 @@
-# Use official PHP 8.3 CLI image
+# Use official PHP 8.3 FPM image
 FROM php:8.3-fpm
 
 # Install system dependencies
@@ -32,8 +32,15 @@ RUN curl -sL https://deb.nodesource.com/setup_18.x | bash - \
 # Set working directory
 WORKDIR /var/www/html
 
-# Copy only necessary files (composer and package files first for caching)
+# Copy composer and package files first for caching
 COPY composer.json composer.lock package.json package-lock.json* ./
+
+# Generate .env file to avoid missing APP_KEY
+COPY .env.example .env
+RUN php -r "file_exists('.env') || copy('.env.example', '.env');" \
+    && php artisan key:generate --force
+
+# Install PHP and JS dependencies
 RUN composer install --no-dev --optimize-autoloader \
     && npm install && npm run build
 
@@ -47,9 +54,5 @@ RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cac
 # Expose port (Railway assigns $PORT dynamically)
 EXPOSE $PORT
 
-# Run migrations and seed during build (optional, can be moved to Railway deploy)
-RUN php artisan migrate --force \
-    && php artisan db:seed --class=KpiSeeder --force
-
-# Start the application with PHP-FPM or artisan serve
-CMD ["sh", "-c", "php artisan serve --host=0.0.0.0 --port=$PORT"]
+# Start the application
+CMD ["sh", "-c", "php artisan migrate --force && php artisan db:seed --class=KpiSeeder --force && php artisan serve --host=0.0.0.0 --port=$PORT"]
