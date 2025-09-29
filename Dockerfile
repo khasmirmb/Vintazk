@@ -58,5 +58,5 @@ RUN php artisan package:discover --ansi
 # Expose port (Railway assigns $PORT dynamically)
 EXPOSE $PORT
 
-# Start the application with migrations and seeding
-CMD ["sh", "-c", "php artisan migrate --force && php artisan db:seed --class=KpiSeeder --force && php artisan serve --host=0.0.0.0 --port=$PORT"]
+# Start the application with migrations and seeding, using --no-interaction
+CMD ["sh", "-c", "php artisan migrate --force --no-interaction && php artisan db:seed --class=KpiSeeder --force --no-interaction && php artisan serve --host=0.0.0.0 --port=$PORT"]
