@@ -58,5 +58,5 @@ RUN php artisan package:discover --ansi
 # Expose port (Railway assigns $PORT dynamically)
 EXPOSE $PORT
 
-# Start the application with verbose debugging, skipping migrations for testing
-CMD ["sh", "-c", "echo 'Environment: APP_ENV=$APP_ENV, DATABASE_URL=$DATABASE_URL' && echo 'Testing PHP...' && php -v && echo 'Testing Artisan...' && php artisan --version && echo 'Testing DB connection...' && php artisan migrate:status --verbose || { echo 'DB connection failed'; exit 1; } && echo 'Starting server...' && php artisan serve --host=0.0.0.0 --port=$PORT"]
+# Start the application with verbose debugging, no DB operations
+CMD ["sh", "-c", "echo 'Environment: APP_ENV=$APP_ENV, DATABASE_URL=$DATABASE_URL' && echo 'Testing PHP...' && php -v && echo 'Testing Artisan...' && php artisan --version && echo 'Starting server...' && php artisan serve --host=0.0.0.0 --port=$PORT"]
