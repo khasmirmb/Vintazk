@@ -32,15 +32,18 @@ RUN curl -sL https://deb.nodesource.com/setup_18.x | bash - \
 # Set working directory
 WORKDIR /var/www/html
 
-# Copy all application files (needed for artisan during composer install)
-COPY . .
-
-# Generate .env file and APP_KEY before composer install
-RUN php -r "file_exists('.env') || copy('.env.example', '.env');" \
-    && php artisan key:generate --force
+# Copy composer files first for caching
+COPY composer.json composer.lock ./
 
 # Install PHP dependencies, skipping scripts to avoid package:discover
 RUN composer install --no-dev --optimize-autoloader --no-scripts
+
+# Copy the rest of the application
+COPY . .
+
+# Generate .env file and APP_KEY
+RUN php -r "file_exists('.env') || copy('.env.example', '.env');" \
+    && php artisan key:generate --force
 
 # Install JS dependencies (if needed)
 RUN [ -f "package.json" ] && npm install && npm run build || true
